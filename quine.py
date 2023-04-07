@@ -37,8 +37,6 @@ def bond(expr):
             break
 
     print('\nQuine')
-    for i in table:
-        print(i)
     print(bonded)
 
 

@@ -55,8 +55,6 @@ def karnaugh_method(expr):
 
     kar_map = kar.fill_kar(table)
 
-    for i in kar_map:
-        print(i)
     row = kar.check_row(list(kar_map))
     square = kar.check_squares(list(kar_map))
     pairs_v = kar.check_pairs_vertical(list(kar_map))
@@ -147,25 +145,25 @@ def karnaugh_method(expr):
                     result.clear()
                     break
                 elif pairs_h_b[j] and j == 0:
-                    result.append('!x1')
+                    result.append('x1')
                     result.append('!x2')
                     big_result.append(list(result))
                     result.clear()
                     break
                 elif pairs_h_b[j] and j == 1:
-                    result.append('!x1')
+                    result.append('x1')
                     result.append('x3')
                     big_result.append(list(result))
                     result.clear()
                     break
                 elif pairs_h_b[j] and j == 2:
-                    result.append('!x1')
+                    result.append('x1')
                     result.append('x2')
                     big_result.append(list(result))
                     result.clear()
                     break
                 elif pairs_h_b[j] and j == 3:
-                    result.append('!x1')
+                    result.append('x1')
                     result.append('!x3')
                     big_result.append(list(result))
                     result.clear()
@@ -183,7 +181,7 @@ def main():
     orig_expr = '(x1 + x2 + x3)*(x1 + !x2 + x3)*(!x1 + !x2 + x3)'
     # orig_expr = '(!x1 * !x2 * x3)+(!x1 * x2 * x3)+(x1 * !x2 * !x3)+(x1 * !x2 * x3)+(x1 * x2 * x3)'
     calc_method(orig_expr)
-    # quine_method(orig_expr)
+    quine_method(orig_expr)
     karnaugh_method(function)
 
 
