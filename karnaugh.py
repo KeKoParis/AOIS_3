@@ -107,8 +107,76 @@ def fill_kar(table):
 
     for i in range(len(kar)):
         for j in range(len(kar[i])):
-            kar[i][j] = table[kar[i][j]-1][3]
+            kar[i][j] = table[kar[i][j] - 1][3]
 
     return kar
 
-def check_row():
+
+def check_row(karn_map):
+    row = 0
+    rows = [False for i in range(2)]
+    for i in karn_map:
+        for j in i:
+            if j != 0:
+                row += 1
+        if row == 4:
+            rows[i] = True
+        row = 0
+
+    return rows
+
+
+def check_squares(karn_map):
+    square = [False for i in range(4)]
+
+    for i in range(3):
+        check_square = 0
+        if karn_map[0][i] != 0 and karn_map[0][i + 1] != 0 and karn_map[1][i] != 0 and karn_map[1][i + 1] != 0:
+            square[i] = True
+
+    if karn_map[0][3] != 0 and karn_map[0][0] != 0 and karn_map[1][3] != 0 and karn_map[1][0] != 0:
+        square[3] = True
+
+    return square
+
+
+def check_pairs_vertical(karn_map):
+    pairs = [False for i in range(4)]
+
+    for i in range(len(karn_map[0])):
+        if karn_map[0][i] != 0 and karn_map[1][i] != 0:
+            pairs[i] = True
+
+    return pairs
+
+
+def check_horiz_pairs_top(karn_map):
+    pairs = list()
+    for i in range(3):
+        if karn_map[0][i] == 1 and karn_map[0][i + 1] == 1:
+            pairs.append(True)
+        else:
+            pairs.append(False)
+
+    if karn_map[0][3] == 1 and karn_map[0][1] == 1:
+        pairs.append(True)
+    else:
+        pairs.append(False)
+
+    return pairs
+
+
+def check_horiz_pairs_bottom(karn_map):
+    pairs = list()
+    for i in range(3):
+        if karn_map[1][i] == 1 and karn_map[1][i + 1] == 1:
+            pairs.append(True)
+        else:
+            pairs.append(False)
+
+    if karn_map[1][3] == 1 and karn_map[1][1] == 1:
+        pairs.append(True)
+    else:
+        pairs.append(False)
+
+    return pairs
