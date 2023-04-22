@@ -26,6 +26,7 @@ def calc_method(orig_expr):
 
 
 def quine_method(orig_expr):
+    print('\n\nQuine')
     quine.solve(orig_expr)
 
 
@@ -157,11 +158,20 @@ def karnaugh_method(expr):
                     continue
     big_result = remove_similar(big_result)
     print()
-    print('Karnaugh map')
+    print('\nKarnaugh map')
+    result_str = ''
+
+    for i in big_result:
+        for j in i:
+            result_str += j
+            result_str += '*'
+        result_str = result_str[:-1]
+        result_str += ' + '
+    result_str = result_str[:-1]
 
     for i in kar_map:
         print(i)
-    print('mdnf', big_result)
+    print('mdnf', result_str)
 
 
 def remove_similar(result):
@@ -187,11 +197,8 @@ def main():
     # function = '(!x1+(x2*x3))'
 
     orig_expr = '(!x1 + x2 + x3)*(!x1+ x2+ !x3)*(!x1 + !x2 + x3)'
-    # calc_method(orig_expr)
-
-    s = '(!x1*!x2*x3)+(!x1*x2*!x3)+(x1*!x2*!x3)+(x1*x2*x3)'
-    p = '(!x1*x2*x3)+(x1*!x2*x3)+(x1*x2*!x3)+(x1*x2*x3)'
-    quine_method(s)
+    calc_method(orig_expr)
+    quine_method(orig_expr)
     karnaugh_method(function)
 
 

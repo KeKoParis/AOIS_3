@@ -1,9 +1,10 @@
 import formatting as form
 
+
 def mul(x, y):  # Multiply 2 minterms
     res = []
     for i in x:
-        if i + "'" in y or (len(i) == 2 and i[0] in y):
+        if "!" + i in y or (len(i) == 2 and i[0] in y):
             return []
         else:
             res.append(i)
@@ -43,7 +44,7 @@ def findVariables(
     var_list = []
     for i in range(len(x)):
         if x[i] == '0':
-            var_list.append('x' + str(i + 1) + "'")
+            var_list.append('!' + 'x' + str(i + 1))
         elif x[i] == '1':
             var_list.append('x' + str(i + 1))
     return var_list
@@ -172,4 +173,4 @@ def solve(expr):
             P.pop(0)
         final_result = [min(P[0], key=len)]  # Choosing the term with minimum variables from P
         final_result.extend(findVariables(i) for i in EPI)  # Adding the EPIs to final solution
-    print('\nSolution: ' + ' + '.join(''.join(i) for i in final_result))
+    print('Solution: ' + ' + '.join(''.join(i) for i in final_result))
