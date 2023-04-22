@@ -167,7 +167,7 @@ def karnaugh_method(expr):
             result_str += '*'
         result_str = result_str[:-1]
         result_str += ' + '
-    result_str = result_str[:-1]
+    result_str = result_str[:-3]
 
     for i in kar_map:
         print(i)
