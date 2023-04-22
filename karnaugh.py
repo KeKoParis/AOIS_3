@@ -7,7 +7,7 @@ def solve(curr_table, curr_expression, index):  # finds pcnf and pdnf
     curr_expression = replace_positive(curr_table, curr_expression, index)
     curr_expression = replace_signs(curr_expression)
 
-    curr_table[index][3] = int(solve_expr(curr_expression))  # resolves logical expression
+    curr_table[index][3] = solve_expr(curr_expression)  # resolves logical expression
 
     return curr_table
 
@@ -115,9 +115,10 @@ def fill_kar(table):
 def check_row(karn_map):
     row = 0
     rows = [False for i in range(2)]
-    for i in karn_map:
-        for j in i:
-            if j != 0:
+
+    for i in range(len(karn_map)):
+        for j in range(len(karn_map[i])):
+            if karn_map[i][j] != 0:
                 row += 1
         if row == 4:
             rows[i] = True
@@ -174,7 +175,7 @@ def check_horiz_pairs_bottom(karn_map):
         else:
             pairs.append(False)
 
-    if karn_map[1][3] == 1 and karn_map[1][1] == 1:
+    if karn_map[1][3] == 1 and karn_map[1][0] == 1:
         pairs.append(True)
     else:
         pairs.append(False)

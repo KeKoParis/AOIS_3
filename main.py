@@ -1,6 +1,6 @@
 import bond_rule as br
-import quine
 import karnaugh as kar
+import quine_method as quine
 
 
 def calc_method(orig_expr):
@@ -26,24 +26,7 @@ def calc_method(orig_expr):
 
 
 def quine_method(orig_expr):
-    orig_expr = orig_expr.replace(' ', '')
-
-    expr = list()
-    if orig_expr.find(')+(') != -1:
-        orig_expr = orig_expr.replace('(', '')
-        orig_expr = orig_expr.replace(')', '')
-        orig_expr = orig_expr.split('+')
-        for i in range(len(orig_expr)):
-            expr.append(orig_expr[i].split('*'))
-        quine.bond(expr)
-
-    else:
-        orig_expr = orig_expr.replace('(', '')
-        orig_expr = orig_expr.replace(')', '')
-        orig_expr = orig_expr.split('*')
-        for i in range(len(orig_expr)):
-            expr.append(orig_expr[i].split('+'))
-        quine.bond(expr)
+    quine.solve(orig_expr)
 
 
 def karnaugh_method(expr):
@@ -52,6 +35,9 @@ def karnaugh_method(expr):
 
     for i in range(8):
         table = kar.solve(table, expr, i)
+
+    for i in table:
+        i[3] = int(i[3])
 
     kar_map = kar.fill_kar(table)
 
@@ -65,123 +51,147 @@ def karnaugh_method(expr):
     big_result = list()
     for i in range(len(kar_map)):
         for j in range(len(kar_map[i])):
+
             if kar_map[i][j] == 1:
                 if row[i] and i == 0:
                     result.append('!x1')
                     big_result.append(list(result))
                     result.clear()
-                    break
+                    continue
                 elif row[i] and i == 1:
                     result.append('x1')
                     big_result.append(list(result))
                     result.clear()
-                    break
-                elif (square[j] and j == 0) or (square[(j//2)*2] and j == 1):
+                    continue
+                elif (square[j] and j == 0) or (square[(j // 2) * 2] and j == 1):
                     result.append('!x2')
                     big_result.append(list(result))
                     result.clear()
-                    break
-                elif (square[j] and j == 1) or (square[j-1] and j == 2):
+                    continue
+                elif (square[j] and j == 1) or (square[j - 1] and j == 2):
                     result.append('x3')
                     big_result.append(list(result))
                     result.clear()
-                    break
-                elif (square[j] and j == 2) or (square[(j//2)*2] and j == 3):
+                    continue
+                elif (square[j] and j == 2) or (square[(j // 2) * 2] and j == 3):
                     result.append('x2')
                     big_result.append(list(result))
                     result.clear()
-                    break
-                elif (square[j] and j == 3) or (square[j-1] and j == 3):
+                    continue
+                elif (square[j] and j == 3) or (square[j - 1] and j == 3):
                     result.append('!x3')
                     big_result.append(list(result))
                     result.clear()
-                    break
+                    continue
                 elif pairs_v[j] and j == 0:
                     result.append('!x2')
                     result.append('!x3')
                     big_result.append(list(result))
                     result.clear()
-                    break
+                    continue
                 elif pairs_v[j] and j == 1:
                     result.append('!x2')
                     result.append('x3')
                     big_result.append(list(result))
                     result.clear()
-                    break
+                    continue
                 elif pairs_v[j] and j == 2:
                     result.append('x2')
                     result.append('x3')
                     big_result.append(list(result))
                     result.clear()
-                    break
+                    continue
                 elif pairs_v[j] and j == 3:
                     result.append('x2')
                     result.append('!x3')
                     big_result.append(list(result))
                     result.clear()
-                    break
+                    continue
                 elif pairs_h_t[j] and j == 0:
                     result.append('!x1')
                     result.append('!x2')
                     big_result.append(list(result))
                     result.clear()
-                    break
+                    continue
                 elif pairs_h_t[j] and j == 1:
                     result.append('!x1')
                     result.append('x3')
                     big_result.append(list(result))
                     result.clear()
-                    break
+                    continue
                 elif pairs_h_t[j] and j == 2:
                     result.append('!x1')
                     result.append('x2')
                     big_result.append(list(result))
                     result.clear()
-                    break
+                    continue
                 elif pairs_h_t[j] and j == 3:
                     result.append('!x1')
                     result.append('!x3')
                     big_result.append(list(result))
                     result.clear()
-                    break
+                    continue
                 elif pairs_h_b[j] and j == 0:
                     result.append('x1')
                     result.append('!x2')
                     big_result.append(list(result))
                     result.clear()
-                    break
+                    continue
                 elif pairs_h_b[j] and j == 1:
                     result.append('x1')
                     result.append('x3')
                     big_result.append(list(result))
                     result.clear()
-                    break
+                    continue
                 elif pairs_h_b[j] and j == 2:
                     result.append('x1')
                     result.append('x2')
                     big_result.append(list(result))
                     result.clear()
-                    break
+                    continue
                 elif pairs_h_b[j] and j == 3:
                     result.append('x1')
                     result.append('!x3')
                     big_result.append(list(result))
                     result.clear()
-                    break
-
+                    continue
+    big_result = remove_similar(big_result)
     print()
     print('Karnaugh map')
-    print(big_result)
+
+    for i in kar_map:
+        print(i)
+    print('mdnf', big_result)
+
+
+def remove_similar(result):
+    curr = list()
+
+    for i in result:
+        check = 0
+        for j in curr:
+            if i == j:
+                check += 1
+        if check == 0:
+            curr.append(i)
+
+    return curr
 
 
 def main():
     # orig_expr = input('Enter expression: ')
     # FUNCTION: ((x1*!x2)+((!x1+x2)*x3))
     function = '((x1*!x2)+((!x1+x2)*x3))'
-    orig_expr = '(x1 + x2 + x3)*(x1 + !x2 + x3)*(!x1 + !x2 + x3)'
+    # orig_expr = '(x1 + x2 + x3)*(x1 + !x2 + x3)*(!x1 + !x2 + x3)'
     # orig_expr = '(!x1 * !x2 * x3)+(!x1 * x2 * x3)+(x1 * !x2 * !x3)+(x1 * !x2 * x3)+(x1 * x2 * x3)'
-    calc_method(orig_expr)
-    quine_method(orig_expr)
+    # function = '(!x1+(x2*x3))'
+
+    orig_expr = '(!x1 + x2 + x3)*(!x1+ x2+ !x3)*(!x1 + !x2 + x3)'
+    # calc_method(orig_expr)
+
+    s = '(!x1*!x2*x3)+(!x1*x2*!x3)+(x1*!x2*!x3)+(x1*x2*x3)'
+    p = '(!x1*x2*x3)+(x1*!x2*x3)+(x1*x2*!x3)+(x1*x2*x3)'
+    quine_method(s)
     karnaugh_method(function)
 
 
