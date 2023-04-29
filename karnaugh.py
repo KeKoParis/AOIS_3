@@ -131,7 +131,6 @@ def check_squares(karn_map):
     square = [False for i in range(4)]
 
     for i in range(3):
-        check_square = 0
         if karn_map[0][i] != 0 and karn_map[0][i + 1] != 0 and karn_map[1][i] != 0 and karn_map[1][i + 1] != 0:
             square[i] = True
 

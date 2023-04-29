@@ -34,8 +34,8 @@ def is_similar(first_expr, second_expr):
 
     if count_similar >= len(first_expr) - 1 and count_similar > 1:
         return True
-
-    return False
+    else:
+        return False
 
 
 def create_new_const(expr, first_num, second_num):

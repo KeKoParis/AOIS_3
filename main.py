@@ -1,7 +1,7 @@
 import bond_rule as br
 import karnaugh as kar
 import quine_method as quine
-
+import check_karno as ck
 
 def calc_method(orig_expr):
     orig_expr = orig_expr.replace(' ', '')
@@ -42,121 +42,9 @@ def karnaugh_method(expr):
 
     kar_map = kar.fill_kar(table)
 
-    row = kar.check_row(list(kar_map))
-    square = kar.check_squares(list(kar_map))
-    pairs_v = kar.check_pairs_vertical(list(kar_map))
-    pairs_h_t = kar.check_horiz_pairs_top(kar_map)
-    pairs_h_b = kar.check_horiz_pairs_bottom(kar_map)
+    karn_check = ck.KarnoCheck(kar_map)
 
-    result = list()
-    big_result = list()
-    for i in range(len(kar_map)):
-        for j in range(len(kar_map[i])):
-
-            if kar_map[i][j] == 1:
-                if row[i] and i == 0:
-                    result.append('!x1')
-                    big_result.append(list(result))
-                    result.clear()
-                    continue
-                elif row[i] and i == 1:
-                    result.append('x1')
-                    big_result.append(list(result))
-                    result.clear()
-                    continue
-                elif (square[j] and j == 0) or (square[(j // 2) * 2] and j == 1):
-                    result.append('!x2')
-                    big_result.append(list(result))
-                    result.clear()
-                    continue
-                elif (square[j] and j == 1) or (square[j - 1] and j == 2):
-                    result.append('x3')
-                    big_result.append(list(result))
-                    result.clear()
-                    continue
-                elif (square[j] and j == 2) or (square[(j // 2) * 2] and j == 3):
-                    result.append('x2')
-                    big_result.append(list(result))
-                    result.clear()
-                    continue
-                elif (square[j] and j == 3) or (square[j - 1] and j == 3):
-                    result.append('!x3')
-                    big_result.append(list(result))
-                    result.clear()
-                    continue
-                elif pairs_v[j] and j == 0:
-                    result.append('!x2')
-                    result.append('!x3')
-                    big_result.append(list(result))
-                    result.clear()
-                    continue
-                elif pairs_v[j] and j == 1:
-                    result.append('!x2')
-                    result.append('x3')
-                    big_result.append(list(result))
-                    result.clear()
-                    continue
-                elif pairs_v[j] and j == 2:
-                    result.append('x2')
-                    result.append('x3')
-                    big_result.append(list(result))
-                    result.clear()
-                    continue
-                elif pairs_v[j] and j == 3:
-                    result.append('x2')
-                    result.append('!x3')
-                    big_result.append(list(result))
-                    result.clear()
-                    continue
-                elif pairs_h_t[j] and j == 0:
-                    result.append('!x1')
-                    result.append('!x2')
-                    big_result.append(list(result))
-                    result.clear()
-                    continue
-                elif pairs_h_t[j] and j == 1:
-                    result.append('!x1')
-                    result.append('x3')
-                    big_result.append(list(result))
-                    result.clear()
-                    continue
-                elif pairs_h_t[j] and j == 2:
-                    result.append('!x1')
-                    result.append('x2')
-                    big_result.append(list(result))
-                    result.clear()
-                    continue
-                elif pairs_h_t[j] and j == 3:
-                    result.append('!x1')
-                    result.append('!x3')
-                    big_result.append(list(result))
-                    result.clear()
-                    continue
-                elif pairs_h_b[j] and j == 0:
-                    result.append('x1')
-                    result.append('!x2')
-                    big_result.append(list(result))
-                    result.clear()
-                    continue
-                elif pairs_h_b[j] and j == 1:
-                    result.append('x1')
-                    result.append('x3')
-                    big_result.append(list(result))
-                    result.clear()
-                    continue
-                elif pairs_h_b[j] and j == 2:
-                    result.append('x1')
-                    result.append('x2')
-                    big_result.append(list(result))
-                    result.clear()
-                    continue
-                elif pairs_h_b[j] and j == 3:
-                    result.append('x1')
-                    result.append('!x3')
-                    big_result.append(list(result))
-                    result.clear()
-                    continue
-    big_result = remove_similar(big_result)
+    big_result = karn_check.check_karno()
     print()
     print('\nKarnaugh map')
     result_str = ''
