@@ -40,7 +40,7 @@ def findEPI(x):  # Function to find essential prime implicants from prime implic
 
 
 def findVariables(
-        x):  # Function to find variables in a meanterm. For example, the minterm --01 has C' and D as variables
+        x):  # Function to find variables in a minterm. For example, the minterm --01 has C' and D as variables
     var_list = []
     for i in range(len(x)):
         if x[i] == '0':
@@ -77,6 +77,7 @@ def findminterms(a):
 
 
 def compare(a, b):  # Function for checking if 2 minterms differ by 1 bit only
+    mismatch_index = 0
     c = 0
     for i in range(len(a)):
         if a[i] != b[i]:
@@ -100,9 +101,9 @@ def solve(expr):
     expr_str = form.formatting(expr)
 
     mt = [int(i) for i in expr_str.strip().split()]
-    #dc = []
+    # dc = []
     mt.sort()
-    minterms = mt #+ dc
+    minterms = mt  # + dc
     minterms.sort()
     size = len(bin(minterms[-1])) - 2
     groups, all_pi = {}, set()
@@ -132,10 +133,13 @@ def solve(expr):
                             groups[m].append(j[:res[1]] + '-' + j[res[1] + 1:]) if j[:res[1]] + '-' + j[res[
                                                                                                             1] + 1:] not in \
                                                                                    groups[
-                                                                                       m] else None  # Put a '-' in the changing bit and add it to corresponding group
+                                                                                       m] else None
+                            # Put a '-' in the changing bit and add it to corresponding group
                         except KeyError:
                             groups[m] = [j[:res[1]] + '-' + j[res[
-                                                                  1] + 1:]]  # If the group doesn't exist, create the group at first and then put a '-' in the changing bit and add it to the newly created group
+                                                                  1] + 1:]]
+                            # If the group doesn't exist, create the group at first and then put a '-'
+                            # in the changing bit and add it to the newly created group
                         should_stop = False
                         marked.add(j)  # Mark element j
                         marked.add(k)  # Mark element k
@@ -147,14 +151,11 @@ def solve(expr):
             break
 
     # Printing and processing of Prime Implicant chart starts
-    largest_mints = len(str(mt[-1]))  # The number of digits of the largest minterm
     chart = {}
 
     for i in all_pi:
-        merged_minterms, y = findminterms(i), 0
-        for j in merged_minterms: #, dc
-            x = mt.index(int(j)) * (largest_mints + 1)
-            y = x + largest_mints
+        merged_minterms = findminterms(i)
+        for j in merged_minterms:
             try:
                 chart[j].append(i) if i not in chart[j] else None  # Add minterm in chart
             except KeyError:
