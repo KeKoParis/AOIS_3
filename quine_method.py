@@ -132,7 +132,7 @@ def solve(expr):
             m += 1
         local_unmarked = set(flatten(cp_group)).difference(marked)  # Unmarked elements of each table
         all_pi = all_pi.union(local_unmarked)  # Adding Prime Implicants to global list
-        # Printing Prime Implicants of current table
+
         if should_stop:  # If the minterms cannot be combined further
             break
 
