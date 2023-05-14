@@ -23,15 +23,7 @@ def multiply(x, y):  # Multiply 2 expressions
     return res
 
 
-def refine(my_list, dc_list):  # Removes don't care terms from a given list and returns refined list
-    res = []
-    for i in my_list:
-        if int(i) not in dc_list:
-            res.append(i)
-    return res
-
-
-def findEPI(x):  # Function to find essential prime implicants from prime implicants chart
+def find_epi(x):  # Function to find essential prime implicants from prime implicants chart
     res = []
     for i in x:
         if len(x[i]) == 1:
@@ -39,8 +31,7 @@ def findEPI(x):  # Function to find essential prime implicants from prime implic
     return res
 
 
-def findVariables(
-        x):  # Function to find variables in a minterm. For example, the minterm --01 has C' and D as variables
+def findVariables(x): # Function to find variables in a minterm. For example, the minterm --01 has C' and D as variables
     var_list = []
     for i in range(len(x)):
         if x[i] == '0':
@@ -101,9 +92,8 @@ def solve(expr):
     expr_str = form.formatting(expr)
 
     mt = [int(i) for i in expr_str.strip().split()]
-    # dc = []
     mt.sort()
-    minterms = mt  # + dc
+    minterms = mt
     minterms.sort()
     size = len(bin(minterms[-1])) - 2
     groups, all_pi = {}, set()
@@ -115,9 +105,6 @@ def solve(expr):
         except KeyError:
             groups[bin(minterm).count('1')] = [bin(minterm)[2:].zfill(size)]
     # Primary grouping ends
-
-    # Primary group printing starts
-    # Primary group printing ends
 
     # Process for creating tables and finding prime implicants starts
     while True:
@@ -162,16 +149,16 @@ def solve(expr):
                 chart[j] = [i]
     # Printing and processing of Prime Implicant chart ends
 
-    EPI = findEPI(chart)  # Finding essential prime implicants
-    removeTerms(chart, EPI)  # Remove EPI related columns from chart
+    epi = find_epi(chart)  # Finding essential prime implicants
+    removeTerms(chart, epi)  # Remove epi related columns from chart
 
-    if len(chart) == 0:  # If no minterms remain after removing EPI related columns
-        final_result = [findVariables(i) for i in EPI]  # Final result with only EPIs
+    if len(chart) == 0:  # If no minterms remain after removing epi related columns
+        final_result = [findVariables(i) for i in epi]  # Final result with only EPIs
     else:  # Else follow Petrick's method for further simplification
-        P = [[findVariables(j) for j in chart[i]] for i in chart]
-        while len(P) > 1:  # Keep multiplying until we get the SOP form of P
-            P[1] = multiply(P[0], P[1])
-            P.pop(0)
-        final_result = [min(P[0], key=len)]  # Choosing the term with minimum variables from P
-        final_result.extend(findVariables(i) for i in EPI)  # Adding the EPIs to final solution
+        petr = [[findVariables(j) for j in chart[i]] for i in chart]
+        while len(petr) > 1:  # Keep multiplying until we get the SOP form of petr
+            petr[1] = multiply(petr[0], petr[1])
+            petr.pop(0)
+        final_result = [min(petr[0], key=len)]  # Choosing the term with minimum variables from petr
+        final_result.extend(findVariables(i) for i in epi)  # Adding the EPIs to final solution
     print('Solution: ' + ' + '.join(''.join(i) for i in final_result))
