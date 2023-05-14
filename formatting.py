@@ -1,4 +1,4 @@
-def formatting(expr):
+def formatting(expr):  # Function converts pcnf or pdnf to numbers
     expr = expr.replace(' ', '')
     if expr.find(')*('):
         number_input = cnf(expr)
@@ -7,17 +7,17 @@ def formatting(expr):
     return number_input
 
 
-def make_list(expr):
+def make_list(expr):  # Function make a list out of implicants
     curr_expr = expr
     new_expr = list()
-    if curr_expr.find(')+(') != -1:
+    if curr_expr.find(')+(') != -1:  # pdnf
         curr_expr = curr_expr.replace('(', '')
         curr_expr = curr_expr.replace(')', '')
         curr_expr = curr_expr.split('+')
         for i in range(len(curr_expr)):
             new_expr.append(curr_expr[i].split('*'))
     else:
-        curr_expr = curr_expr.replace('(', '')
+        curr_expr = curr_expr.replace('(', '')  # pcnf
         curr_expr = curr_expr.replace(')', '')
         curr_expr = curr_expr.split('*')
         for i in range(len(curr_expr)):
@@ -26,7 +26,7 @@ def make_list(expr):
     return new_expr
 
 
-def cnf(expr):
+def cnf(expr):  # Function converts pcnf to binary numbers
     curr_expr = make_list(expr)
     dec = list()
     dec_str = ''
@@ -45,7 +45,7 @@ def cnf(expr):
     return dec_str
 
 
-def exclude(expr, dec):
+def exclude(expr, dec):  # Function excludes numbers of pcnf
     level = 0
 
     for i in reversed(range(6)):
@@ -65,14 +65,14 @@ def exclude(expr, dec):
     return number_list
 
 
-def convert_num(bin_number):
+def convert_num(bin_number):  # Function converts decimal numbers to binary
     dec_number = 0
     for i in range(len(bin_number)):
         dec_number += 2 ** i * int(bin_number[len(bin_number) - 1 - i])
     return dec_number
 
 
-def dnf(expr):
+def dnf(expr):  # Function converts pdnf to binary numbers
     curr_expr = make_list(expr)
     dec = list()
     dec_str = ''
