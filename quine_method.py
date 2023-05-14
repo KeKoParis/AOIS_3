@@ -83,8 +83,8 @@ def compare(a, b):  # Function for checking if 2 minterms differ by 1 bit only
             mismatch_index = i
             c += 1
             if c > 1:
-                return (False, None)
-    return (True, mismatch_index)
+                return False, None
+    return True, mismatch_index
 
 
 def removeTerms(_chart, terms):  # Removes minterms which are already covered from chart
@@ -100,8 +100,9 @@ def solve(expr):
     expr_str = form.formatting(expr)
 
     mt = [int(i) for i in expr_str.strip().split()]
+    #dc = []
     mt.sort()
-    minterms = mt
+    minterms = mt #+ dc
     minterms.sort()
     size = len(bin(minterms[-1])) - 2
     groups, all_pi = {}, set()
@@ -114,15 +115,17 @@ def solve(expr):
             groups[bin(minterm).count('1')] = [bin(minterm)[2:].zfill(size)]
     # Primary grouping ends
 
+    # Primary group printing starts
+    # Primary group printing ends
 
     # Process for creating tables and finding prime implicants starts
     while True:
-        tmp = groups.copy()
+        cp_group = groups.copy()
         groups, m, marked, should_stop = {}, 0, set(), True
-        l = sorted(list(tmp.keys()))
-        for i in range(len(l) - 1):
-            for j in tmp[l[i]]:  # Loop which iterates through current group elements
-                for k in tmp[l[i + 1]]:  # Loop which iterates through next group elements
+        list_sort = sorted(list(cp_group.keys()))
+        for i in range(len(list_sort) - 1):
+            for j in cp_group[list_sort[i]]:  # Loop which iterates through current group elements
+                for k in cp_group[list_sort[i + 1]]:  # Loop which iterates through next group elements
                     res = compare(j, k)  # Compare the minterms
                     if res[0]:  # If the minterms differ by 1 bit only
                         try:
@@ -137,21 +140,21 @@ def solve(expr):
                         marked.add(j)  # Mark element j
                         marked.add(k)  # Mark element k
             m += 1
-        local_unmarked = set(flatten(tmp)).difference(marked)  # Unmarked elements of each table
+        local_unmarked = set(flatten(cp_group)).difference(marked)  # Unmarked elements of each table
         all_pi = all_pi.union(local_unmarked)  # Adding Prime Implicants to global list
         # Printing Prime Implicants of current table
         if should_stop:  # If the minterms cannot be combined further
             break
 
     # Printing and processing of Prime Implicant chart starts
-    sz = len(str(mt[-1]))  # The number of digits of the largest minterm
+    largest_mints = len(str(mt[-1]))  # The number of digits of the largest minterm
     chart = {}
 
     for i in all_pi:
         merged_minterms, y = findminterms(i), 0
-        for j in merged_minterms:
-            x = mt.index(int(j)) * (sz + 1)
-            y = x + sz
+        for j in merged_minterms: #, dc
+            x = mt.index(int(j)) * (largest_mints + 1)
+            y = x + largest_mints
             try:
                 chart[j].append(i) if i not in chart[j] else None  # Add minterm in chart
             except KeyError:
@@ -161,7 +164,7 @@ def solve(expr):
     EPI = findEPI(chart)  # Finding essential prime implicants
     removeTerms(chart, EPI)  # Remove EPI related columns from chart
 
-    if (len(chart) == 0):  # If no minterms remain after removing EPI related columns
+    if len(chart) == 0:  # If no minterms remain after removing EPI related columns
         final_result = [findVariables(i) for i in EPI]  # Final result with only EPIs
     else:  # Else follow Petrick's method for further simplification
         P = [[findVariables(j) for j in chart[i]] for i in chart]
