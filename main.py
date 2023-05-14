@@ -3,6 +3,7 @@ import karnaugh as kar
 import quine_method as quine
 import check_karno as ck
 
+
 def calc_method(orig_expr):
     orig_expr = orig_expr.replace(' ', '')
 
@@ -14,7 +15,12 @@ def calc_method(orig_expr):
         orig_expr = orig_expr.split('+')
         for i in range(len(orig_expr)):
             expr.append(orig_expr[i].split('*'))
-        print(br.bond_pcnf(br.bond(expr)))
+        minimized = br.bond_pcnf(br.bond(expr))
+        result = ""
+        for i in minimized:
+            for j in i:
+                result += str(j)
+            result += " + "
 
     else:
         orig_expr = orig_expr.replace('(', '')
@@ -22,7 +28,16 @@ def calc_method(orig_expr):
         orig_expr = orig_expr.split('*')
         for i in range(len(orig_expr)):
             expr.append(orig_expr[i].split('+'))
-        print(br.bond(expr))
+        minimized = br.bond(expr)
+        result = ""
+        for i in minimized:
+            for j in i:
+                result += str(j) + "+"
+            result = result[:-1]
+            result += " * "
+
+    result = result[:-3]
+    print(result)
 
 
 def quine_method(orig_expr):
