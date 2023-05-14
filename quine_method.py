@@ -23,15 +23,7 @@ def multiply(x, y):  # Multiply 2 expressions
     return res
 
 
-def refine(my_list, dc_list):  # Removes don't care terms from a given list and returns refined list
-    res = []
-    for i in my_list:
-        if int(i) not in dc_list:
-            res.append(i)
-    return res
-
-
-def findEPI(x):  # Function to find essential prime implicants from prime implicants chart
+def find_epi(x):  # Function to find essential prime implicants from prime implicants chart
     res = []
     for i in x:
         if len(x[i]) == 1:
@@ -40,7 +32,7 @@ def findEPI(x):  # Function to find essential prime implicants from prime implic
 
 
 def findVariables(
-        x):  # Function to find variables in a meanterm. For example, the minterm --01 has C' and D as variables
+        x):  # Function to find variables in a minterm. For example, the minterm --01 has !C and D as variables
     var_list = []
     for i in range(len(x)):
         if x[i] == '0':
@@ -62,22 +54,22 @@ def findminterms(a):
     if gaps == 0:
         return [str(int(a, 2))]
     x = [bin(i)[2:].zfill(gaps) for i in range(pow(2, gaps))]
-    temp = []
+    minterms = []
     for i in range(pow(2, gaps)):
-        temp2, ind = a[:], -1
+        curr_minterms, ind = a[:], -1
         for j in x[0]:
             if ind != -1:
-                ind = ind + temp2[ind + 1:].find('-') + 1
+                ind = ind + curr_minterms[ind + 1:].find('-') + 1
             else:
-                ind = temp2[ind + 1:].find('-')
-            temp2 = temp2[:ind] + j + temp2[ind + 1:]
-        temp.append(str(int(temp2, 2)))
+                ind = curr_minterms[ind + 1:].find('-')
+            curr_minterms = curr_minterms[:ind] + j + curr_minterms[ind + 1:]
+        minterms.append(str(int(curr_minterms, 2)))
         x.pop(0)
-    return temp
+    return minterms
 
 
 def compare(a, b):  # Function for checking if 2 minterms differ by 1 bit only
-    c = 0
+    c, mismatch_index = 0, 0
     for i in range(len(a)):
         if a[i] != b[i]:
             mismatch_index = i
@@ -100,9 +92,8 @@ def solve(expr):
     expr_str = form.formatting(expr)
 
     mt = [int(i) for i in expr_str.strip().split()]
-    #dc = []
     mt.sort()
-    minterms = mt #+ dc
+    minterms = mt
     minterms.sort()
     size = len(bin(minterms[-1])) - 2
     groups, all_pi = {}, set()
@@ -114,9 +105,6 @@ def solve(expr):
         except KeyError:
             groups[bin(minterm).count('1')] = [bin(minterm)[2:].zfill(size)]
     # Primary grouping ends
-
-    # Primary group printing starts
-    # Primary group printing ends
 
     # Process for creating tables and finding prime implicants starts
     while True:
@@ -132,10 +120,12 @@ def solve(expr):
                             groups[m].append(j[:res[1]] + '-' + j[res[1] + 1:]) if j[:res[1]] + '-' + j[res[
                                                                                                             1] + 1:] not in \
                                                                                    groups[
-                                                                                       m] else None  # Put a '-' in the changing bit and add it to corresponding group
+                                                                                       m] else None
+                            # Put a '-' in the changing bit and add it to corresponding group
                         except KeyError:
-                            groups[m] = [j[:res[1]] + '-' + j[res[
-                                                                  1] + 1:]]  # If the group doesn't exist, create the group at first and then put a '-' in the changing bit and add it to the newly created group
+                            groups[m] = [j[:res[1]] + '-' + j[res[1] + 1:]]
+                            # If the group doesn't exist, create the group at first and then put a '-' in the changing
+                            # bit and add it to the newly created group
                         should_stop = False
                         marked.add(j)  # Mark element j
                         marked.add(k)  # Mark element k
@@ -146,31 +136,26 @@ def solve(expr):
         if should_stop:  # If the minterms cannot be combined further
             break
 
-    # Printing and processing of Prime Implicant chart starts
-    largest_mints = len(str(mt[-1]))  # The number of digits of the largest minterm
     chart = {}
 
     for i in all_pi:
         merged_minterms, y = findminterms(i), 0
-        for j in merged_minterms: #, dc
-            x = mt.index(int(j)) * (largest_mints + 1)
-            y = x + largest_mints
+        for j in merged_minterms:
             try:
                 chart[j].append(i) if i not in chart[j] else None  # Add minterm in chart
             except KeyError:
                 chart[j] = [i]
-    # Printing and processing of Prime Implicant chart ends
 
-    EPI = findEPI(chart)  # Finding essential prime implicants
-    removeTerms(chart, EPI)  # Remove EPI related columns from chart
+    epi = find_epi(chart)  # Finding essential prime implicants
+    removeTerms(chart, epi)  # Remove epi related columns from chart
 
-    if len(chart) == 0:  # If no minterms remain after removing EPI related columns
-        final_result = [findVariables(i) for i in EPI]  # Final result with only EPIs
+    if len(chart) == 0:  # If no minterms remain after removing epi related columns
+        final_result = [findVariables(i) for i in epi]  # Final result with only EPIs
     else:  # Else follow Petrick's method for further simplification
-        P = [[findVariables(j) for j in chart[i]] for i in chart]
-        while len(P) > 1:  # Keep multiplying until we get the SOP form of P
-            P[1] = multiply(P[0], P[1])
-            P.pop(0)
-        final_result = [min(P[0], key=len)]  # Choosing the term with minimum variables from P
-        final_result.extend(findVariables(i) for i in EPI)  # Adding the EPIs to final solution
+        petr = [[findVariables(j) for j in chart[i]] for i in chart]
+        while len(petr) > 1:  # Keep multiplying until we get the SOP form of petr
+            petr[1] = multiply(petr[0], petr[1])
+            petr.pop(0)
+        final_result = [min(petr[0], key=len)]  # Choosing the term with minimum variables from petr
+        final_result.extend(findVariables(i) for i in epi)  # Adding the EPIs to final solution
     print('Solution: ' + ' + '.join(''.join(i) for i in final_result))
