@@ -1,12 +1,11 @@
 import bond_rule as br
-import check_karno as ck
 import karnaugh as kar
 import quine_method as quine
-
+import check_karno as ck
 
 def calc_method(orig_expr):
     orig_expr = orig_expr.replace(' ', '')
-    minimized = list()
+
     print('Calc')
     expr = list()
     if orig_expr.find(')+(') != -1:
@@ -15,12 +14,7 @@ def calc_method(orig_expr):
         orig_expr = orig_expr.split('+')
         for i in range(len(orig_expr)):
             expr.append(orig_expr[i].split('*'))
-        minimized = br.bond_pcnf(br.bond(expr))
-        result = ""
-        for i in minimized:
-            for j in i:
-                result += str(j)
-            result += " + "
+        print(br.bond_pcnf(br.bond(expr)))
 
     else:
         orig_expr = orig_expr.replace('(', '')
@@ -28,16 +22,7 @@ def calc_method(orig_expr):
         orig_expr = orig_expr.split('*')
         for i in range(len(orig_expr)):
             expr.append(orig_expr[i].split('+'))
-        minimized = br.bond(expr)
-        result = ""
-        for i in minimized:
-            for j in i:
-                result += str(j) + "+"
-            result = result[:-1]
-            result += " * "
-
-    result = result[:-3]
-    print(result)
+        print(br.bond(expr))
 
 
 def quine_method(orig_expr):
