@@ -91,6 +91,28 @@ def removeTerms(_chart, terms):  # Removes minterms which are already covered fr
 def solve(expr):
     expr_str = form.formatting(expr)
 
+    groups, all_pi = primary_grouping(expr_str)
+
+    all_pi = finding_prime_implicants(groups, all_pi)
+
+    chart = fulfill_chart(all_pi)
+
+    epi = find_epi(chart)  # Finding essential prime implicants
+    removeTerms(chart, epi)  # Remove epi related columns from chart
+
+    if len(chart) == 0:  # If no minterms remain after removing epi related columns
+        final_result = [findVariables(i) for i in epi]  # Final result with only EPIs
+    else:  # Else follow Petrick's method for further simplification
+        petr = [[findVariables(j) for j in chart[i]] for i in chart]
+        while len(petr) > 1:  # Keep multiplying until we get the SOP form of petr
+            petr[1] = multiply(petr[0], petr[1])
+            petr.pop(0)
+        final_result = [min(petr[0], key=len)]  # Choosing the term with minimum variables from petr
+        final_result.extend(findVariables(i) for i in epi)  # Adding the EPIs to final solution
+    print('Solution: ' + ' + '.join(''.join(i) for i in final_result))
+
+
+def primary_grouping(expr_str):
     mt = [int(i) for i in expr_str.strip().split()]
     mt.sort()
     minterms = mt
@@ -106,6 +128,10 @@ def solve(expr):
             groups[bin(minterm).count('1')] = [bin(minterm)[2:].zfill(size)]
     # Primary grouping ends
 
+    return groups, all_pi
+
+
+def finding_prime_implicants(groups, all_pi):
     # Process for creating tables and finding prime implicants starts
     while True:
         cp_group = groups.copy()
@@ -135,8 +161,11 @@ def solve(expr):
 
         if should_stop:  # If the minterms cannot be combined further
             break
+    return all_pi
 
-    chart = {}
+
+def fulfill_chart(all_pi):
+    chart ={}
 
     for i in all_pi:
         merged_minterms, y = findminterms(i), 0
@@ -146,16 +175,4 @@ def solve(expr):
             except KeyError:
                 chart[j] = [i]
 
-    epi = find_epi(chart)  # Finding essential prime implicants
-    removeTerms(chart, epi)  # Remove epi related columns from chart
-
-    if len(chart) == 0:  # If no minterms remain after removing epi related columns
-        final_result = [findVariables(i) for i in epi]  # Final result with only EPIs
-    else:  # Else follow Petrick's method for further simplification
-        petr = [[findVariables(j) for j in chart[i]] for i in chart]
-        while len(petr) > 1:  # Keep multiplying until we get the SOP form of petr
-            petr[1] = multiply(petr[0], petr[1])
-            petr.pop(0)
-        final_result = [min(petr[0], key=len)]  # Choosing the term with minimum variables from petr
-        final_result.extend(findVariables(i) for i in epi)  # Adding the EPIs to final solution
-    print('Solution: ' + ' + '.join(''.join(i) for i in final_result))
+    return chart
